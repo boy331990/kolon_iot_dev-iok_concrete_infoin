@@ -1,0 +1,21 @@
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      nodejs: 10 # 런타임 nodejs10으로 설정
+    commands:
+      - rm -rf package-lock.json
+  pre_build:
+    commands:
+      - yarn install # 빌드에 필요한 패키지 설치
+  build:
+    commands:
+      - yarn build:dev # 빌드
+artifacts:
+  files:
+    - appspec.yml
+    - build/**/*
+cache:
+  paths:
+    - node_modules/
