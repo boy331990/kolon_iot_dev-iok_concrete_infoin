@@ -122,7 +122,7 @@ const Details = props => {
                                         <SelectTemperatureTypes store={localStore}/>
                                     </TableCell>
                                 </TableRow>
-                                <TableRow>
+                                {localStore.valueType === 'INTERNAL' && <TableRow>
                                     <TableCell align={"left"}>외부 구속 계수</TableCell>
                                     <TableCell align={"left"}>
                                         <RadioGroup aria-label="outdoor" name="outdoor" value={value} onChange={handleChange}>
@@ -133,7 +133,7 @@ const Details = props => {
                                             />
                                         </RadioGroup>
                                     </TableCell>
-                                </TableRow>
+                                </TableRow>}
                                 <TableRow>
                                     <TableCell align={"left"}>설명</TableCell>
                                     <TableCell align={"left"}>

@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useEffect} from "react";
 import {FormControl, MenuItem, Select} from "@material-ui/core";
 import {useObserver} from "mobx-react-lite";
 
@@ -9,9 +9,14 @@ const data = [
 ];
 
 export const SelectTemperatureTypes = props => {
+
     const {store} = props;
 
     const handleChange = event => store.setValue("valueType", event.target.value);
+
+    useEffect(() => {
+        store.setValue("valueType", "INTERNAL");
+    }, []);
 
     return useObserver(() => (
         <FormControl fullWidth variant={"outlined"} margin={"dense"}>
@@ -23,7 +28,12 @@ export const SelectTemperatureTypes = props => {
                 onChange={handleChange}
             >
                 {data && data.map((item, index) => (
-                    <MenuItem key={index} value={item["value"]}>{item["label"]} ({item["value"]})</MenuItem>
+                    <MenuItem 
+                        key={index} 
+                        value={item["value"]}
+                    >
+                        {item["label"]} ({item["value"]})
+                    </MenuItem>
                 ))}
             </Select>
         </FormControl>
