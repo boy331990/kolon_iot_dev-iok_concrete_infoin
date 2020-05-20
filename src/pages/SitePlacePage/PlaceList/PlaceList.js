@@ -23,8 +23,9 @@ const headCells = [
     {id: "name", numeric: false, disablePadding: false, label: "장소명"},
     {id: "details", numeric: false, disablePadding: false, label: "설명"},
     // {id: "add1", numeric: false, disablePadding: false, label: "추가정보1(양생정보)", component: <Button variant={"outlined"} size={"small"}>등록/수정</Button>},
+    // {id: "add2", numeric: false, disablePadding: false, label: "추가정보2(배합표)", component: <Button variant={"outlined"} size={"small"}>보기</Button>}
     {id: "add1", numeric: false, disablePadding: false, label: "추가정보1(양생정보)"},
-    {id: "add2", numeric: false, disablePadding: false, label: "추가정보2(배합표)", component: <Button variant={"outlined"} size={"small"}>보기</Button>}
+    {id: "add2", numeric: false, disablePadding: false, label: "추가정보2(배합표)"}
 ];
 
 export const PlaceList = observer(props => {
@@ -37,9 +38,9 @@ export const PlaceList = observer(props => {
         url: process.env.REACT_APP_API_GATEWAY + `/sites/${store.siteCodeData}/places`
     });
 
-    const handleClick = id => {
-         history.push("/site/setting/add");
-    };
+    // const handleClick = id => {
+    //      history.push("/site/setting/add");
+    // };
 
     const handleAdd = () => {
         history.push(`${url}/add?siteCode=${store.siteCodeData}`);

@@ -55,8 +55,13 @@ export const EnhancedTableWithoutCheckbox = (props) => {
 
     const history = useHistory();
 
-    const handleClick = id => {
-        history.push("/site/setting/add");
+    const handleClick = (id, rowIdx) => {
+        console.log(id, rowIdx);
+        if(id === 'add1') {
+            history.push("/site/setting/add");
+        } else {
+            history.push("/mix-table");
+        }
    };
 
     return (
@@ -106,6 +111,9 @@ export const EnhancedTableWithoutCheckbox = (props) => {
                                 let primaryValue = "";
                                 let primaryHide = false;
                                 let parentCode = "";
+
+                                let rowIdx = index;
+
                                 const cell = headCells.map((headCell, index) => {
                                     if (headCell.primary) {
                                         primaryHide = headCell.hide;
@@ -120,9 +128,9 @@ export const EnhancedTableWithoutCheckbox = (props) => {
 
                                     // return !headCell.hide && (<TableCell key={index} align="left">{rowValue ? String(rowValue) : '-'}</TableCell>)
                                     if(headCell.id === 'add1') {
-                                        return !headCell.hide && (<TableCell key={index} align="left"><Button variant={"outlined"} size={"small"} onClick={handleClick}>등록/수정</Button></TableCell>)
+                                        return !headCell.hide && (<TableCell key={index} align="left"><Button variant={"outlined"} size={"small"} onClick={ () => { handleClick(headCell.id, rowIdx) } }>등록/수정</Button></TableCell>)
                                     } else if(headCell.id === 'add2') {
-                                        return !headCell.hide && (<TableCell key={index} align="left">{headCell.component}</TableCell>)
+                                        return !headCell.hide && (<TableCell key={index} align="left"><Button variant={"outlined"} size={"small"} onClick={ () => { handleClick(headCell.id, rowIdx) } }>보기</Button></TableCell>)
                                     } else {
                                         return !headCell.hide && (<TableCell key={index} align="left">{rowValue ? String(rowValue) : '-'}</TableCell>)
                                     }
