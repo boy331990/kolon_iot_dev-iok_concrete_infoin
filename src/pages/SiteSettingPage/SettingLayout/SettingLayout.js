@@ -1,4 +1,4 @@
-import React, {useContext, useEffect} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import {Button, CardActions, CardContent, CardHeader, Divider, Grid, Paper, Table, TableBody, TableCell, TableContainer, TableRow} from '@material-ui/core';
 import {useLocalStore, useObserver} from "mobx-react-lite";
 import {toJS} from "mobx";
@@ -95,6 +95,18 @@ const Details = props => {
     };
 
 
+    const [siteName,            setsiteName             ] = useState('-');
+    const [placeName,           setplaceName            ] = useState('-');
+    const [pourSite,            setpourSite             ] = useState('-');
+    const [pourPosition,        setpourPosition         ] = useState('-');
+    const [pourThickness,       setpourThickness        ] = useState('-');
+    const [pourHeight1,         setpourHeight1          ] = useState('-');
+    const [pourHeight2,         setpourHeight2          ] = useState('-');
+    const [pourHeight3,         setpourHeight3          ] = useState('-');
+    const [pourHeightN,         setpourHeightN          ] = useState('-');
+    const [curingMethod,        setcuringMethod         ] = useState('-');
+    const [standardCrackFactor, setstandardCrackFactor  ] = useState('-');
+
 
     useEffect((props) => {
 
@@ -110,7 +122,33 @@ const Details = props => {
         };
 
         defaultAxios(options).then(response => {
-            console.log(response);
+
+            const data = response.data;
+            console.log(data);
+
+            const crackDescription              = data.crackDescription         ;                  
+            const endDatetime                   = data.endDatetime              ;  
+            const externalRestrictionFactor     = data.externalRestrictionFactor;              
+            const mixtureInformation            = data.mixtureInformation       ;          
+            // const placeCode                     = data.placeCode                ;
+            const placeName                     = data.placeName                ;
+            // const siteCode                      = data.siteCode                 ;
+            const siteName                      = data.siteName                 ;
+            const standardCrackFactor           = data.standardCrackFactor      ;         
+            const startDatetime                 = data.startDatetime            ;
+            const temperatureCrackingType       = data.temperatureCrackingType  ;           
+
+            localStore.startDate = new Date(startDatetime);
+            localStore.endDate = new Date(endDatetime);
+
+            setstandardCrackFactor(standardCrackFactor);
+            localStore.valueType = temperatureCrackingType;
+
+            setsiteName(siteName);
+            setplaceName(placeName);
+
+
+
         }).catch(reason => {
             console.error(reason);
         });
@@ -140,7 +178,7 @@ const Details = props => {
                                 <TableRow>
                                     <TableCell align={"left"}>관리 기준 균열 지수</TableCell>
                                     <TableCell align={"left"}>
-                                        <OutlinedInput margin={"dense"} inputProps={{'aria-label': 'criteria'}}/>
+                                        <OutlinedInput margin={"dense"} inputProps={{'aria-label': 'criteria'}} value={standardCrackFactor}/>
                                     </TableCell>
                                 </TableRow>
                                 <TableRow>
@@ -169,7 +207,10 @@ const Details = props => {
                                 </TableRow>
                                 <TableRow>
                                     <TableCell align={"left"} colSpan={2}>
-                                        <MixTable/>
+                                        <MixTable
+                                            siteName={siteName}
+                                            placeName={placeName}
+                                        />
                                     </TableCell>
                                 </TableRow>
                             </TableBody>

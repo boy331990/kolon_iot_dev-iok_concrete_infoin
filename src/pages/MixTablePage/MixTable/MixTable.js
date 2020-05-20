@@ -1,9 +1,18 @@
-import React from 'react';
-import {Grid, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow} from "@material-ui/core";
+import React, { useEffect } from 'react';
+import {Grid, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Input} from "@material-ui/core";
+import { useHistory } from "react-router-dom";
 
 
-export const MixTable = () => {
 
+export const MixTable = (props) => {
+
+    let history = useHistory();
+    let url = history.location.pathname;
+
+    let mixTableUrl =  url !== '/mix-table' ? true : false;
+
+    //console.log(props);
+    const {siteName, placeName} = props
     return (
         <Paper>
             <Grid container direction={"column"}>
@@ -30,7 +39,7 @@ export const MixTable = () => {
                                     <TableCell align={"center"}>n단</TableCell>
                                 </TableRow>
                                 <TableRow>
-                                    <TableCell align={"center"}>LH건설<br/>세종</TableCell>
+                                    {/* <TableCell align={"center"}>LH건설<br/>세종</TableCell>
                                     <TableCell align={"center"}>서울 구로</TableCell>
                                     <TableCell align={"center"}>2020-10-20</TableCell>
                                     <TableCell align={"center"}>매트기초</TableCell>
@@ -41,7 +50,19 @@ export const MixTable = () => {
                                     <TableCell align={"center"}>1,000</TableCell>
                                     <TableCell align={"center"}>-</TableCell>
                                     <TableCell align={"center"}>버블시트</TableCell>
-                                    <TableCell align={"center"}>1.2</TableCell>
+                                    <TableCell align={"center"}>1.2</TableCell> */}
+                                    <TableCell align={"center"}>{mixTableUrl && <Input id={"siteName"} name={"siteName"} value={siteName}></Input>}</TableCell>
+                                    <TableCell align={"center"}><Input id={"placeName"} name={"placeName"} value={placeName}></Input></TableCell>
+                                    <TableCell align={"center"}><Input id={"startDatetime"} name={"startDatetime"}></Input>2020-10-20</TableCell>
+                                    <TableCell align={"center"}><Input id={"pourSite"} name={"pourSite"}></Input>매트기초</TableCell>
+                                    <TableCell align={"center"}><Input id={"pourPosition"} name={"pourPosition"}></Input>연질의 지반 위</TableCell>
+                                    <TableCell align={"center"}><Input id={"pourThickness"} name={"pourThickness"}></Input>2,600</TableCell>
+                                    <TableCell align={"center"}><Input id={"pourHeight1"} name={"pourHeight1"}></Input>800</TableCell>
+                                    <TableCell align={"center"}><Input id={"pourHeight2"} name={"pourHeight2"}></Input>800</TableCell>
+                                    <TableCell align={"center"}><Input id={"pourHeight3"} name={"pourHeight3"}></Input>1,000</TableCell>
+                                    <TableCell align={"center"}><Input id={"pourHeightN"} name={"pourHeightN"}></Input>-</TableCell>
+                                    <TableCell align={"center"}><Input id={"curingMethod"} name={"curingMethod"}></Input>버블시트</TableCell>
+                                    <TableCell align={"center"}><Input id={"standardCrackFactor"} name={"standardCrackFactor"}></Input>1.2</TableCell>
                                 </TableRow>
                             </TableBody>
                         </Table>
@@ -56,7 +77,7 @@ export const MixTable = () => {
                                         <TableRow>
                                             <TableCell align={"center"} rowSpan={4}>호칭방법</TableCell>
                                             <TableCell align={"center"} variant={"head"}>콘크리트의 종류</TableCell>
-                                            <TableCell align={"center"} colSpan={2}>보릉콘크리트</TableCell>
+                                            <TableCell align={"center"} colSpan={2}><Input id={"concreteKinds"} name={"concreteKinds"}></Input></TableCell>
                                         </TableRow>
                                         <TableRow>
                                             <TableCell align={"center"} variant={"head"}>굵은 골재의 최대치수</TableCell>

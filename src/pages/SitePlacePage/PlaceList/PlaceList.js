@@ -1,4 +1,4 @@
-import React, {useContext} from 'react';
+import React from 'react';
 import {useHistory, useRouteMatch} from "react-router-dom";
 import {observer} from "mobx-react-lite";
 import {Button} from "@material-ui/core";
@@ -6,7 +6,6 @@ import {makeStyles} from "@material-ui/core/styles";
 import {AddBox as AddBoxIcon} from "@material-ui/icons";
 import {EnhancedTableWithoutCheckbox} from "../../../components/molecules";
 import {useAxios} from "../../../hooks";
-import {StoreContext} from "../../../context";
 
 
 const useStyles = makeStyles(theme => ({
@@ -34,17 +33,9 @@ export const PlaceList = observer(props => {
     const {store} = props;
     const history = useHistory();
     const {url} = useRouteMatch();
-    const {authentication} = useContext(StoreContext);
 
     const {loading, data} = useAxios({
         url: process.env.REACT_APP_API_GATEWAY + `/sites/${store.siteCodeData}/places`
-        // url: process.env.REACT_APP_API_CONCRETE + `/concrete/sites/${store.siteCodeData}/information`,
-        // method: 'get',
-        //     headers: {
-        //         Accept: "application/json",
-        //         "Content-Type": "application/json",
-        //         Authorization: "Bearer " + authentication.accessToken
-        //     }
     });
 
     // const handleClick = id => {
