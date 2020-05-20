@@ -1,4 +1,4 @@
-import React, {useContext} from 'react';
+import React, {useContext, useEffect} from 'react';
 import {Button, CardActions, CardContent, CardHeader, Divider, Grid, Paper, Table, TableBody, TableCell, TableContainer, TableRow} from '@material-ui/core';
 import {useLocalStore, useObserver} from "mobx-react-lite";
 import {toJS} from "mobx";
@@ -13,6 +13,7 @@ import RadioGroup from "@material-ui/core/RadioGroup";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 import Radio from "@material-ui/core/Radio";
 import OutlinedInput from "@material-ui/core/OutlinedInput";
+import {MixTable} from '../../MixTablePage/MixTable/MixTable';
 
 const useStyle = makeStyles(() => ({
     card: {
@@ -93,6 +94,32 @@ const Details = props => {
         localStore.endDate = date;
     };
 
+
+
+    useEffect((props) => {
+
+        const options = {
+            // url: process.env.REACT_APP_API_GATEWAY + (`/sites/${query.get("siteCode")}/places/${query.get("placeCode")}/information`),
+            url: process.env.REACT_APP_API_CONCRETE + (`/concrete/sites/${query.get("siteCode")}/places/${query.get("placeCode")}/information`),
+            method: 'get',
+            headers: {
+                Accept: "application/json",
+                "Content-Type": "application/json",
+                Authorization: "Bearer " + authentication.accessToken
+            }
+        };
+
+        defaultAxios(options).then(response => {
+            console.log(response);
+        }).catch(reason => {
+            console.error(reason);
+        });
+
+    }, []);
+
+
+
+
     return useObserver(() => (
         <Paper>
             <form autoComplete="off" noValidate onSubmit={handleSubmit}>
@@ -122,7 +149,7 @@ const Details = props => {
                                         <SelectTemperatureTypes store={localStore}/>
                                     </TableCell>
                                 </TableRow>
-                                {localStore.valueType === 'INTERNAL' && <TableRow>
+                                {localStore.valueType !== 'INTERNAL' && <TableRow>
                                     <TableCell align={"left"}>외부 구속 계수</TableCell>
                                     <TableCell align={"left"}>
                                         <RadioGroup aria-label="outdoor" name="outdoor" value={value} onChange={handleChange}>
@@ -138,6 +165,11 @@ const Details = props => {
                                     <TableCell align={"left"}>설명</TableCell>
                                     <TableCell align={"left"}>
                                         <img src={process.env.PUBLIC_URL + "/images/du.png"} alt={"공식"}/>
+                                    </TableCell>
+                                </TableRow>
+                                <TableRow>
+                                    <TableCell align={"left"} colSpan={2}>
+                                        <MixTable/>
                                     </TableCell>
                                 </TableRow>
                             </TableBody>

@@ -6,7 +6,6 @@ import {EnhancedTableHead} from "../../molecules";
 import {getComparator, getNestedObject, stableSort} from "../../../functions";
 import {useHistory} from "react-router-dom";
 
-
 const useStyles = makeStyles(() => ({
     paper: {
         width: "100%",
@@ -27,7 +26,7 @@ const useStyles = makeStyles(() => ({
 
 
 export const EnhancedTableWithoutCheckbox = (props) => {
-    const {title, headCells, rows, orderByKeyword, orderKeyword, rowClick, dense, downloadButton, onUpload} = props;
+    const {title, headCells, rows, orderByKeyword, orderKeyword, rowClick, dense, downloadButton, onUpload, siteCode} = props;
     const classes = useStyles();
     const [order, setOrder] = useState(orderKeyword ? orderKeyword : "desc");
     const [orderBy, setOrderBy] = useState(orderByKeyword ? orderByKeyword : "createdDatetime");
@@ -54,11 +53,9 @@ export const EnhancedTableWithoutCheckbox = (props) => {
 
 
     const history = useHistory();
-
-    const handleClick = (id, rowIdx) => {
-        console.log(id, rowIdx);
+    const handleClick = (id, rowIdx, placeCode) => {
         if(id === 'add1') {
-            history.push("/site/setting/add");
+            history.push(`/site/setting/add?siteCode=${siteCode}&placeCode=${placeCode}`);
         } else {
             history.push("/mix-table");
         }
@@ -113,6 +110,7 @@ export const EnhancedTableWithoutCheckbox = (props) => {
                                 let parentCode = "";
 
                                 let rowIdx = index;
+                                let placeCode = row.code;
 
                                 const cell = headCells.map((headCell, index) => {
                                     if (headCell.primary) {
@@ -128,9 +126,9 @@ export const EnhancedTableWithoutCheckbox = (props) => {
 
                                     // return !headCell.hide && (<TableCell key={index} align="left">{rowValue ? String(rowValue) : '-'}</TableCell>)
                                     if(headCell.id === 'add1') {
-                                        return !headCell.hide && (<TableCell key={index} align="left"><Button variant={"outlined"} size={"small"} onClick={ () => { handleClick(headCell.id, rowIdx) } }>등록/수정</Button></TableCell>)
+                                        return !headCell.hide && (<TableCell key={index} align="left"><Button variant={"outlined"} size={"small"} onClick={ () => { handleClick(headCell.id, rowIdx, placeCode) } } >등록/수정</Button></TableCell>)
                                     } else if(headCell.id === 'add2') {
-                                        return !headCell.hide && (<TableCell key={index} align="left"><Button variant={"outlined"} size={"small"} onClick={ () => { handleClick(headCell.id, rowIdx) } }>보기</Button></TableCell>)
+                                        return !headCell.hide && (<TableCell key={index} align="left"><Button variant={"outlined"} size={"small"} onClick={ () => { handleClick(headCell.id, rowIdx, placeCode) } }>보기</Button></TableCell>)
                                     } else {
                                         return !headCell.hide && (<TableCell key={index} align="left">{rowValue ? String(rowValue) : '-'}</TableCell>)
                                     }
