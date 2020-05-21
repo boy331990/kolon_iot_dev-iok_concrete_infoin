@@ -57,7 +57,7 @@ export const EnhancedTableWithoutCheckbox = (props) => {
         if(id === 'add1') {
             history.push(`/site/setting/add?siteCode=${siteCode}&placeCode=${placeCode}`);
         } else {
-            history.push("/mix-table");
+            history.push(`/mix-table?siteCode=${siteCode}&placeCode=${placeCode}`);
         }
    };
 

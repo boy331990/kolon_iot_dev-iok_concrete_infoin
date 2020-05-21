@@ -1,18 +1,80 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import {Grid, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Input} from "@material-ui/core";
-import { useHistory } from "react-router-dom";
+import { useHistory, useLocation } from "react-router-dom";
+import defaultAxios from "axios";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import {TextField} from "@material-ui/core";
 
+
+function useQuery() {
+    return new URLSearchParams(useLocation().search);
+}
 
 
 export const MixTable = (props) => {
 
     let history = useHistory();
     let url = history.location.pathname;
+    let mixTableUrl =  url === '/mix-table' ? true : false;
+    const query = useQuery();
 
-    let mixTableUrl =  url !== '/mix-table' ? true : false;
+    const [siteName,            setsiteName             ] = useState('-');
+    // const [placeName,           setplaceName            ] = useState('-');
+    const [placeName,           setplaceName            ] = useState(props.placeName);
+    const [pourSite,            setpourSite             ] = useState('-');
+    const [pourPosition,        setpourPosition         ] = useState('-');
+    const [pourThickness,       setpourThickness        ] = useState('-');
+    const [pourHeight1,         setpourHeight1          ] = useState('-');
+    const [pourHeight2,         setpourHeight2          ] = useState('-');
+    const [pourHeight3,         setpourHeight3          ] = useState('-');
+    const [pourHeightN,         setpourHeightN          ] = useState('-');
+    const [curingMethod,        setcuringMethod         ] = useState('-');
+    const [standardCrackFactor, setstandardCrackFactor  ] = useState('-');
 
-    //console.log(props);
-    const {siteName, placeName} = props
+    const [startDatetime, setstartDatetime] = useState();
+
+    useEffect(() => {
+
+        const options = {
+            url: process.env.REACT_APP_API_CONCRETE + (`/concrete/sites/${query.get("siteCode")}/places/${query.get("placeCode")}/information`),
+            method: 'get'
+        };
+    
+        if(mixTableUrl) {
+            defaultAxios(options).then(response => {
+    
+                const data = response.data;
+                console.log(data);
+        
+                const crackDescription              = data.crackDescription         ;                  
+                const endDatetime                   = data.endDatetime              ;  
+                const externalRestrictionFactor     = data.externalRestrictionFactor;              
+                const mixtureInformation            = data.mixtureInformation       ;          
+                // const placeCode                     = data.placeCode                ;
+                const placeName                     = data.placeName                ;
+                // const siteCode                      = data.siteCode                 ;
+                const siteName                      = data.siteName                 ;
+                const standardCrackFactor           = data.standardCrackFactor      ;         
+                const startDatetime                 = data.startDatetime            ;
+                const temperatureCrackingType       = data.temperatureCrackingType  ;           
+        
+                // localStore.startDate = new Date(startDatetime);
+                // localStore.endDate = new Date(endDatetime);
+        
+                setstandardCrackFactor(standardCrackFactor);
+                // localStore.valueType = temperatureCrackingType;
+        
+                setsiteName(siteName);
+                setplaceName(placeName);
+        
+            }).catch(reason => {
+                console.error(reason);
+            });
+        } 
+    
+    }, []);
+
     return (
         <Paper>
             <Grid container direction={"column"}>
@@ -51,18 +113,27 @@ export const MixTable = (props) => {
                                     <TableCell align={"center"}>-</TableCell>
                                     <TableCell align={"center"}>버블시트</TableCell>
                                     <TableCell align={"center"}>1.2</TableCell> */}
-                                    <TableCell align={"center"}>{mixTableUrl && <Input id={"siteName"} name={"siteName"} value={siteName}></Input>}</TableCell>
-                                    <TableCell align={"center"}><Input id={"placeName"} name={"placeName"} value={placeName}></Input></TableCell>
-                                    <TableCell align={"center"}><Input id={"startDatetime"} name={"startDatetime"}></Input>2020-10-20</TableCell>
-                                    <TableCell align={"center"}><Input id={"pourSite"} name={"pourSite"}></Input>매트기초</TableCell>
-                                    <TableCell align={"center"}><Input id={"pourPosition"} name={"pourPosition"}></Input>연질의 지반 위</TableCell>
-                                    <TableCell align={"center"}><Input id={"pourThickness"} name={"pourThickness"}></Input>2,600</TableCell>
-                                    <TableCell align={"center"}><Input id={"pourHeight1"} name={"pourHeight1"}></Input>800</TableCell>
-                                    <TableCell align={"center"}><Input id={"pourHeight2"} name={"pourHeight2"}></Input>800</TableCell>
-                                    <TableCell align={"center"}><Input id={"pourHeight3"} name={"pourHeight3"}></Input>1,000</TableCell>
-                                    <TableCell align={"center"}><Input id={"pourHeightN"} name={"pourHeightN"}></Input>-</TableCell>
-                                    <TableCell align={"center"}><Input id={"curingMethod"} name={"curingMethod"}></Input>버블시트</TableCell>
-                                    <TableCell align={"center"}><Input id={"standardCrackFactor"} name={"standardCrackFactor"}></Input>1.2</TableCell>
+                                    <TableCell align={"center"}>{!mixTableUrl && <Input id={"siteName"} name={"siteName"} value={props.siteName}></Input>}{mixTableUrl && siteName}</TableCell>
+                                    <TableCell align={"center"}><Input id={"placeName"} name={"placeName"} value={placeName/* props.placeName */}></Input></TableCell>
+                                    <TableCell align={"center"}>
+                                        {/* <Input id={"startDatetime"} name={"startDatetime"} value={props.startDatetime}></Input> */}
+                                        <DatePicker
+                                            selected={props.startDatetime}
+                                            name={"startDate"}
+                                            onChange={date => setstartDatetime(date)}
+                                            customInput={<TextField variant={"outlined"} margin={"dense"} label={"시작일"}/>}
+                                            dateFormat="yyyy-MM-dd"
+                                        />
+                                    </TableCell>
+                                    <TableCell align={"center"}><Input id={"pourSite"} name={"pourSite"} value={props.pourSite}></Input></TableCell>
+                                    <TableCell align={"center"}><Input id={"pourPosition"} name={"pourPosition"}></Input></TableCell>
+                                    <TableCell align={"center"}><Input id={"pourThickness"} name={"pourThickness"}></Input></TableCell>
+                                    <TableCell align={"center"}><Input id={"pourHeight1"} name={"pourHeight1"}></Input></TableCell>
+                                    <TableCell align={"center"}><Input id={"pourHeight2"} name={"pourHeight2"}></Input></TableCell>
+                                    <TableCell align={"center"}><Input id={"pourHeight3"} name={"pourHeight3"}></Input></TableCell>
+                                    <TableCell align={"center"}><Input id={"pourHeightN"} name={"pourHeightN"}></Input></TableCell>
+                                    <TableCell align={"center"}><Input id={"curingMethod"} name={"curingMethod"}></Input></TableCell>
+                                    <TableCell align={"center"}><Input id={"standardCrackFactor"} name={"standardCrackFactor"}></Input></TableCell>
                                 </TableRow>
                             </TableBody>
                         </Table>

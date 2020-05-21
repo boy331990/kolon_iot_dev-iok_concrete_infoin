@@ -1,5 +1,5 @@
 import React, {useContext, useEffect, useState} from 'react';
-import {Button, CardActions, CardContent, CardHeader, Divider, Grid, Paper, Table, TableBody, TableCell, TableContainer, TableRow} from '@material-ui/core';
+import {Button, CardActions, CardContent, CardHeader, Divider, Grid, Paper, Table, TableBody, TableCell, TableContainer, TableRow, TextareaAutosize} from '@material-ui/core';
 import {useLocalStore, useObserver} from "mobx-react-lite";
 import {toJS} from "mobx";
 import {useHistory, useLocation, useRouteMatch} from "react-router-dom";
@@ -13,7 +13,6 @@ import RadioGroup from "@material-ui/core/RadioGroup";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 import Radio from "@material-ui/core/Radio";
 import OutlinedInput from "@material-ui/core/OutlinedInput";
-import {MixTable} from '../../MixTablePage/MixTable/MixTable';
 
 const useStyle = makeStyles(() => ({
     card: {
@@ -32,10 +31,18 @@ const Details = props => {
     const {authentication} = useContext(StoreContext);
     const classes = useStyle();
 
-    const [value, setValue] = React.useState(1);
+    //const [value, setValue] = React.useState(1);
 
-    const handleChange = event => {
-        setValue(event.target.value);
+    const handleRadioChange = event => {
+        localStore.externalRestrictionFactor = event.target.value;
+    };
+    
+    const handleInputChange = event => {
+        localStore.standardCrackFactor = event.target.value;
+    };
+
+    const handleTextareaChange = event => {
+        setmixtureInformation(event.target.value);
     };
 
     const date = new Date();
@@ -45,9 +52,18 @@ const Details = props => {
 
     const localStore = useLocalStore(() => ({
         siteCode: query.get("siteCode"),
-        valueType: "",
+        siteName: "",
+        placeCode: query.get("placeCode"),
+        placeName: "",
+        // valueType: "",
+        standardCrackFactor: "", //관리기준 균열지수
+        temperatureCrackingType: "", //온도균열 발생유형
+        externalRestrictionFactor: "", //외부 구속 계수
+        crackDescription: "",
         startDate: date,
         endDate: Date.now(),
+        startDatetime: date,
+        endDatetime: Date.now(),
         setValue(name, value) {
             localStore[name] = value;
         },
@@ -59,25 +75,24 @@ const Details = props => {
     const handleSubmit = event => {
         event.preventDefault();
 
+        localStore.setValue('mixtureInformation', mixtureInformation);
+        localStore.setValue('startDatetime', (localStore.startDatetime.toISOString()).slice(0, -1));
+        localStore.setValue('endDatetime', (localStore.endDatetime.toISOString()).slice(0, -1));
+
         const options = {
-            url: process.env.REACT_APP_API_GATEWAY + (match ? `/sites/${query.get("siteCode")}/places` : `/sites/${query.get("siteCode")}/places/${query.get("placeCode")}`),
-            method: match ? 'post' : 'put',
+            // url: process.env.REACT_APP_API_GATEWAY + (match ? `/sites/${query.get("siteCode")}/places` : `/sites/${query.get("siteCode")}/places/${query.get("placeCode")}`),
+            url: process.env.REACT_APP_API_CONCRETE + (`/concrete/sites/${query.get("siteCode")}/places/${query.get("placeCode")}/information`),
+            method: 'put',
             headers: {
                 Accept: "application/json",
                 "Content-Type": "application/json",
-                Authorization: "Bearer " + authentication.accessToken
+                //Authorization: "Bearer " + authentication.accessToken
             },
             data: toJS(localStore)
         };
 
         defaultAxios(options).then(response => {
             console.log(response);
-            if (response.status === 200) {
-                // Modify
-            } else if (response.status === 201) {
-                // Save
-            }
-            history.push("/site/place");
         }).catch(reason => {
             console.error(reason);
         });
@@ -88,24 +103,15 @@ const Details = props => {
 
     const handleSetStartDate = (date) => {
         localStore.startDate = date;
+        localStore.startDatetime = date;
     };
 
     const handleSetEndDate = (date) => {
         localStore.endDate = date;
+        localStore.endDatetime = date;
     };
 
-
-    const [siteName,            setsiteName             ] = useState('-');
-    const [placeName,           setplaceName            ] = useState('-');
-    const [pourSite,            setpourSite             ] = useState('-');
-    const [pourPosition,        setpourPosition         ] = useState('-');
-    const [pourThickness,       setpourThickness        ] = useState('-');
-    const [pourHeight1,         setpourHeight1          ] = useState('-');
-    const [pourHeight2,         setpourHeight2          ] = useState('-');
-    const [pourHeight3,         setpourHeight3          ] = useState('-');
-    const [pourHeightN,         setpourHeightN          ] = useState('-');
-    const [curingMethod,        setcuringMethod         ] = useState('-');
-    const [standardCrackFactor, setstandardCrackFactor  ] = useState('-');
+    const [mixtureInformation, setmixtureInformation] = useState('');
 
 
     useEffect((props) => {
@@ -124,30 +130,29 @@ const Details = props => {
         defaultAxios(options).then(response => {
 
             const data = response.data;
-            console.log(data);
 
-            const crackDescription              = data.crackDescription         ;                  
-            const endDatetime                   = data.endDatetime              ;  
-            const externalRestrictionFactor     = data.externalRestrictionFactor;              
-            const mixtureInformation            = data.mixtureInformation       ;          
-            // const placeCode                     = data.placeCode                ;
-            const placeName                     = data.placeName                ;
-            // const siteCode                      = data.siteCode                 ;
-            const siteName                      = data.siteName                 ;
-            const standardCrackFactor           = data.standardCrackFactor      ;         
             const startDatetime                 = data.startDatetime            ;
-            const temperatureCrackingType       = data.temperatureCrackingType  ;           
+            const endDatetime                   = data.endDatetime              ;
+            const temperatureCrackingType       = data.temperatureCrackingType  ;
+            const standardCrackFactor           = data.standardCrackFactor      ;
+            const externalRestrictionFactor     = data.externalRestrictionFactor;
+            const mixtureInformation            = data.mixtureInformation       ;
+            const siteName                      = data.siteName                 ;
+            const placeName                     = data.placeName                ;
+            const crackDescription              = data.crackDescription         ;
 
             localStore.startDate = new Date(startDatetime);
+            localStore.startDatetime = new Date(startDatetime);
             localStore.endDate = new Date(endDatetime);
+            localStore.endDatetime = new Date(endDatetime);
+            localStore.temperatureCrackingType = temperatureCrackingType;
+            localStore.standardCrackFactor = standardCrackFactor;
+            localStore.externalRestrictionFactor = externalRestrictionFactor;
+            localStore.siteName = siteName;
+            localStore.placeName = placeName;
+            localStore.crackDescription = crackDescription;
 
-            setstandardCrackFactor(standardCrackFactor);
-            localStore.valueType = temperatureCrackingType;
-
-            setsiteName(siteName);
-            setplaceName(placeName);
-
-
+            setmixtureInformation(mixtureInformation);
 
         }).catch(reason => {
             console.error(reason);
@@ -178,7 +183,7 @@ const Details = props => {
                                 <TableRow>
                                     <TableCell align={"left"}>관리 기준 균열 지수</TableCell>
                                     <TableCell align={"left"}>
-                                        <OutlinedInput margin={"dense"} inputProps={{'aria-label': 'criteria'}} value={standardCrackFactor}/>
+                                        <OutlinedInput margin={"dense"} inputProps={{'aria-label': 'criteria'}} value={localStore.standardCrackFactor} onChange={handleInputChange}/>
                                     </TableCell>
                                 </TableRow>
                                 <TableRow>
@@ -187,14 +192,15 @@ const Details = props => {
                                         <SelectTemperatureTypes store={localStore}/>
                                     </TableCell>
                                 </TableRow>
-                                {localStore.valueType !== 'INTERNAL' && <TableRow>
+                                {/* {localStore.valueType === 'EXTERNAL' && <TableRow> */}
+                                {localStore.temperatureCrackingType === 'EXTERNAL' && <TableRow>
                                     <TableCell align={"left"}>외부 구속 계수</TableCell>
                                     <TableCell align={"left"}>
-                                        <RadioGroup aria-label="outdoor" name="outdoor" value={value} onChange={handleChange}>
-                                            <FormControlLabel value="1" control={<Radio/>} label="비교적 연한 암반 위에 콘크리트를 칠 때 : 0.5"/>
-                                            <FormControlLabel value="2" control={<Radio/>} label="중간 정도의 단단한 암반 위에 콘크리트를 칠 때 : 0.65"/>
-                                            <FormControlLabel value="3" control={<Radio/>} label="경암 위에 콘크리트를 칠 때 : 0.8"/>
-                                            <FormControlLabel value="4" control={<Radio/>} label="이미 경화된 콘크리트 위에 칠 때 : 0.6"
+                                        <RadioGroup aria-label="outdoor" name="outdoor" value={localStore.externalRestrictionFactor} onChange={handleRadioChange}>
+                                            <FormControlLabel value="0.5" control={<Radio/>} label="비교적 연한 암반 위에 콘크리트를 칠 때 : 0.5"/>
+                                            <FormControlLabel value="0.65" control={<Radio/>} label="중간 정도의 단단한 암반 위에 콘크리트를 칠 때 : 0.65"/>
+                                            <FormControlLabel value="0.8" control={<Radio/>} label="경암 위에 콘크리트를 칠 때 : 0.8"/>
+                                            <FormControlLabel value="0.6" control={<Radio/>} label="이미 경화된 콘크리트 위에 칠 때 : 0.6"
                                             />
                                         </RadioGroup>
                                     </TableCell>
@@ -207,9 +213,9 @@ const Details = props => {
                                 </TableRow>
                                 <TableRow>
                                     <TableCell align={"left"} colSpan={2}>
-                                        <MixTable
-                                            siteName={siteName}
-                                            placeName={placeName}
+                                        <TextareaAutosize
+                                            defaultValue={mixtureInformation}
+                                            onChange={handleTextareaChange}
                                         />
                                     </TableCell>
                                 </TableRow>
