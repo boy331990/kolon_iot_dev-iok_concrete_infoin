@@ -93,6 +93,9 @@ const Details = props => {
 
         defaultAxios(options).then(response => {
             console.log(response);
+            if(response.status === 200) {
+                history.replace({pathname: "/site/place"});
+            }
         }).catch(reason => {
             console.error(reason);
         });
@@ -154,6 +157,7 @@ const Details = props => {
 
             setmixtureInformation(mixtureInformation);
 
+        
         }).catch(reason => {
             console.error(reason);
         });
@@ -214,6 +218,7 @@ const Details = props => {
                                 <TableRow>
                                     <TableCell align={"left"} colSpan={2}>
                                         <TextareaAutosize
+                                            style={{width: '50vw'}}
                                             defaultValue={mixtureInformation}
                                             onChange={handleTextareaChange}
                                         />

@@ -1,11 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import {Grid, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Input} from "@material-ui/core";
-import { useHistory, useLocation } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import defaultAxios from "axios";
-import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
-import {TextField} from "@material-ui/core";
-
+import moment from 'moment';
 
 function useQuery() {
     return new URLSearchParams(useLocation().search);
@@ -14,25 +11,49 @@ function useQuery() {
 
 export const MixTable = (props) => {
 
-    let history = useHistory();
-    let url = history.location.pathname;
-    let mixTableUrl =  url === '/mix-table' ? true : false;
+    const [siteName, setsiteName] = useState('');
+    const [placeName, setplaceName] = useState('');
+    const [startDatetime, setstartDatetime] = useState('');
+    const [standardCrackFactor, setstandardCrackFactor] = useState('');
+    const [pourSite, setpourSite] = useState('');
+    const [pourPosition, setpourPosition] = useState('');
+    const [pourThickness, setpourThickness] = useState('');
+    const [pourHeight0, setpourHeight0] = useState('');
+    const [pourHeight1, setpourHeight1] = useState('');
+    const [pourHeight2, setpourHeight2] = useState('');
+    const [pourHeight3, setpourHeight3] = useState('');
+    const [curingMethod, setcuringMethod] = useState('');
+
+    const [concreteKinds, setconcreteKinds] = useState('');
+    const [maxDimension, setmaxDimension] = useState('');
+    const [nominalStrength, setnominalStrength] = useState('');
+    const [slump, setslump] = useState('');
+
+    const [mixedMaterialArray, setmixedMaterialArray] = useState([]);
+    const [totalCombinedAmount, settotalCombinedAmount] = useState('');
+    const [mixedCementRatio, setmixedCementRatio] = useState('');
+
+    const [etc, setetc] = useState([]);
+
+    const [c1 , setc1 ] = useState('');
+    const [c2 , setc2 ] = useState('');
+    const [c3 , setc3 ] = useState('');
+    const [fa , setfa ] = useState('');
+    const [bs , setbs ] = useState('');
+    const [w1 , setw1 ] = useState('');
+    const [w2 , setw2 ] = useState('');
+    const [sc , setsc ] = useState('');
+    const [sw , setsw ] = useState('');
+    const [g1 , setg1 ] = useState('');
+    const [g2 , setg2 ] = useState('');
+    const [ad1, setad1] = useState('');
+    const [ad2, setad2] = useState('');
+    const [ad3, setad3] = useState('');
+    const [couplingRatio, setcouplingRatio] = useState('');
+    const [fineAggregateRatio, setfineAggregateRatio] = useState('');
+
+
     const query = useQuery();
-
-    const [siteName,            setsiteName             ] = useState('-');
-    // const [placeName,           setplaceName            ] = useState('-');
-    const [placeName,           setplaceName            ] = useState(props.placeName);
-    const [pourSite,            setpourSite             ] = useState('-');
-    const [pourPosition,        setpourPosition         ] = useState('-');
-    const [pourThickness,       setpourThickness        ] = useState('-');
-    const [pourHeight1,         setpourHeight1          ] = useState('-');
-    const [pourHeight2,         setpourHeight2          ] = useState('-');
-    const [pourHeight3,         setpourHeight3          ] = useState('-');
-    const [pourHeightN,         setpourHeightN          ] = useState('-');
-    const [curingMethod,        setcuringMethod         ] = useState('-');
-    const [standardCrackFactor, setstandardCrackFactor  ] = useState('-');
-
-    const [startDatetime, setstartDatetime] = useState();
 
     useEffect(() => {
 
@@ -41,37 +62,135 @@ export const MixTable = (props) => {
             method: 'get'
         };
     
-        if(mixTableUrl) {
-            defaultAxios(options).then(response => {
+        defaultAxios(options).then(response => {
+
+            const data = response.data;
+            console.log(data);
+            
+            const siteName                      = data.siteName                 ;
+            const placeName                     = data.placeName                ;
+            const startDatetime                 = data.startDatetime            ;
+            const standardCrackFactor           = data.standardCrackFactor      ;
+
+            setsiteName(siteName);
+            setplaceName(placeName);
+            setstartDatetime(moment(startDatetime).format('yyyy-MM-DD'));
+            setstandardCrackFactor(standardCrackFactor);
+
+            if(data.mixtureInformation !== undefined && data.mixtureInformation !== "null") {
+                const mixtureInformationObj = JSON.parse(data.mixtureInformation);
+                const pourSite                      = mixtureInformationObj.pourSite;
+                const pourPosition                  = mixtureInformationObj.pourPosition;
+                const pourThickness                 = mixtureInformationObj.pourThickness;
+                const pourHeight                    = mixtureInformationObj.pourHeight;
+                const curingMethod                  = mixtureInformationObj.curingMethod;
+
+                setpourSite(pourSite);
+                setpourPosition(pourPosition) ;
+                setpourThickness(pourThickness);
+                for(const i in pourHeight) {
+                    switch (i) {
+                        case '0':
+                            setpourHeight0(pourHeight[0]);
+                            break;
+                        case '1':
+                            setpourHeight1(pourHeight[1]);
+                            break;
+                        case '2':
+                            setpourHeight2(pourHeight[2]);
+                            break;
+                        case '3':
+                            setpourHeight3(pourHeight[3]);
+                            break;
+                        default:
+                            break;
+                    }
+                }
+                setcuringMethod(curingMethod);
+
+
+              
+                if(mixtureInformationObj.nominalMethod !== undefined && mixtureInformationObj.nominalMethod !== "null") {
+                    const nominalMethodObj = mixtureInformationObj.nominalMethod;
+                    const concreteKinds                 = nominalMethodObj.concreteKinds;
+                    const maxDimension                  = nominalMethodObj.maxDimension;
+                    const nominalStrength               = nominalMethodObj.nominalStrength;
+                    const slump                         = nominalMethodObj.slump;
+
+                    //호칭방법
+                    setconcreteKinds(concreteKinds);
+                    setmaxDimension(maxDimension);
+                    setnominalStrength(nominalStrength);
+                    setslump(slump);
+                }
+
+
+                if(mixtureInformationObj.specification !== undefined && mixtureInformationObj.specification !== "null") {
+                    const specificationObj = mixtureInformationObj.specification;
+                    const totalCombinedAmount           = specificationObj.totalCombinedAmount;
+                    const mixedMaterialArray            = specificationObj.mixedMaterial;
+                    const mixedCementRatio              = specificationObj.mixedCementRatio;
+
+                    settotalCombinedAmount(totalCombinedAmount);
+                    setmixedCementRatio(mixedCementRatio);
+                    setmixedMaterialArray(mixedMaterialArray);
+                    
+                }
+
+
+                if(mixtureInformationObj.etc !== undefined && mixtureInformationObj.etc !== "null") {
+                    const etcArray = mixtureInformationObj.etc;
+                    setetc(etcArray);
+                }
+
+
+                if(mixtureInformationObj.formula !== undefined && mixtureInformationObj.formula !== "null") {
+                    const formulaObj = mixtureInformationObj.formula;
+                    const c1                            = formulaObj.c1;
+                    const c2                            = formulaObj.c2;
+                    const c3                            = formulaObj.c3;
+                    const fa                            = formulaObj.fa;
+                    const bs                            = formulaObj.bs;
+                    const w1                            = formulaObj.w1;
+                    const w2                            = formulaObj.w2;
+                    const sc                            = formulaObj.sc;
+                    const sw                            = formulaObj.sw;
+                    const g1                            = formulaObj.g1;
+                    const g2                            = formulaObj.g2;
+                    const ad1                           = formulaObj.ad1;
+                    const ad2                           = formulaObj.ad2;
+                    const ad3                           = formulaObj.ad3;
+                    const couplingRatio                 = formulaObj.couplingRatio;
+                    const fineAggregateRatio            = formulaObj.fineAggregateRatio;
+
+                    setc1 (c1);
+                    setc2 (c2);
+                    setc3 (c3);
+                    setfa (fa);
+                    setbs (bs);
+                    setw1 (w1);
+                    setw2 (w2);
+                    setsc (sc);
+                    setsw (sw);
+                    setg1 (g1);
+                    setg2 (g2);
+                    setad1(ad1);
+                    setad2(ad2);
+                    setad3(ad3);
+                    setcouplingRatio(couplingRatio);
+                    setfineAggregateRatio(fineAggregateRatio);
+                }
+
+
+            }
+            
+
+            
+
     
-                const data = response.data;
-                console.log(data);
-        
-                const crackDescription              = data.crackDescription         ;                  
-                const endDatetime                   = data.endDatetime              ;  
-                const externalRestrictionFactor     = data.externalRestrictionFactor;              
-                const mixtureInformation            = data.mixtureInformation       ;          
-                // const placeCode                     = data.placeCode                ;
-                const placeName                     = data.placeName                ;
-                // const siteCode                      = data.siteCode                 ;
-                const siteName                      = data.siteName                 ;
-                const standardCrackFactor           = data.standardCrackFactor      ;         
-                const startDatetime                 = data.startDatetime            ;
-                const temperatureCrackingType       = data.temperatureCrackingType  ;           
-        
-                // localStore.startDate = new Date(startDatetime);
-                // localStore.endDate = new Date(endDatetime);
-        
-                setstandardCrackFactor(standardCrackFactor);
-                // localStore.valueType = temperatureCrackingType;
-        
-                setsiteName(siteName);
-                setplaceName(placeName);
-        
-            }).catch(reason => {
-                console.error(reason);
-            });
-        } 
+        }).catch(reason => {
+            console.error(reason);
+        });
     
     }, []);
 
@@ -101,39 +220,18 @@ export const MixTable = (props) => {
                                     <TableCell align={"center"}>n단</TableCell>
                                 </TableRow>
                                 <TableRow>
-                                    {/* <TableCell align={"center"}>LH건설<br/>세종</TableCell>
-                                    <TableCell align={"center"}>서울 구로</TableCell>
-                                    <TableCell align={"center"}>2020-10-20</TableCell>
-                                    <TableCell align={"center"}>매트기초</TableCell>
-                                    <TableCell align={"center"}>연질의 지반 위</TableCell>
-                                    <TableCell align={"center"}>2,600</TableCell>
-                                    <TableCell align={"center"}>800</TableCell>
-                                    <TableCell align={"center"}>800</TableCell>
-                                    <TableCell align={"center"}>1,000</TableCell>
-                                    <TableCell align={"center"}>-</TableCell>
-                                    <TableCell align={"center"}>버블시트</TableCell>
-                                    <TableCell align={"center"}>1.2</TableCell> */}
-                                    <TableCell align={"center"}>{!mixTableUrl && <Input id={"siteName"} name={"siteName"} value={props.siteName}></Input>}{mixTableUrl && siteName}</TableCell>
-                                    <TableCell align={"center"}><Input id={"placeName"} name={"placeName"} value={placeName/* props.placeName */}></Input></TableCell>
-                                    <TableCell align={"center"}>
-                                        {/* <Input id={"startDatetime"} name={"startDatetime"} value={props.startDatetime}></Input> */}
-                                        <DatePicker
-                                            selected={props.startDatetime}
-                                            name={"startDate"}
-                                            onChange={date => setstartDatetime(date)}
-                                            customInput={<TextField variant={"outlined"} margin={"dense"} label={"시작일"}/>}
-                                            dateFormat="yyyy-MM-dd"
-                                        />
-                                    </TableCell>
-                                    <TableCell align={"center"}><Input id={"pourSite"} name={"pourSite"} value={props.pourSite}></Input></TableCell>
-                                    <TableCell align={"center"}><Input id={"pourPosition"} name={"pourPosition"}></Input></TableCell>
-                                    <TableCell align={"center"}><Input id={"pourThickness"} name={"pourThickness"}></Input></TableCell>
-                                    <TableCell align={"center"}><Input id={"pourHeight1"} name={"pourHeight1"}></Input></TableCell>
-                                    <TableCell align={"center"}><Input id={"pourHeight2"} name={"pourHeight2"}></Input></TableCell>
-                                    <TableCell align={"center"}><Input id={"pourHeight3"} name={"pourHeight3"}></Input></TableCell>
-                                    <TableCell align={"center"}><Input id={"pourHeightN"} name={"pourHeightN"}></Input></TableCell>
-                                    <TableCell align={"center"}><Input id={"curingMethod"} name={"curingMethod"}></Input></TableCell>
-                                    <TableCell align={"center"}><Input id={"standardCrackFactor"} name={"standardCrackFactor"}></Input></TableCell>
+                                    <TableCell align={"center"}>{siteName}</TableCell>
+                                    <TableCell align={"center"}>{placeName}</TableCell>
+                                    <TableCell align={"center"}>{startDatetime}</TableCell>
+                                    <TableCell align={"center"}>{pourSite}</TableCell>
+                                    <TableCell align={"center"}>{pourPosition}</TableCell>
+                                    <TableCell align={"center"}>{pourThickness}</TableCell>
+                                    <TableCell align={"center"}>{pourHeight0}</TableCell>
+                                    <TableCell align={"center"}>{pourHeight1}</TableCell>
+                                    <TableCell align={"center"}>{pourHeight2}</TableCell>
+                                    <TableCell align={"center"}>{pourHeight3}</TableCell>
+                                    <TableCell align={"center"}>{curingMethod}</TableCell>
+                                    <TableCell align={"center"}>{standardCrackFactor}</TableCell>
                                 </TableRow>
                             </TableBody>
                         </Table>
@@ -148,21 +246,21 @@ export const MixTable = (props) => {
                                         <TableRow>
                                             <TableCell align={"center"} rowSpan={4}>호칭방법</TableCell>
                                             <TableCell align={"center"} variant={"head"}>콘크리트의 종류</TableCell>
-                                            <TableCell align={"center"} colSpan={2}><Input id={"concreteKinds"} name={"concreteKinds"}></Input></TableCell>
+                                            <TableCell align={"center"} colSpan={2}>{concreteKinds}</TableCell>
                                         </TableRow>
                                         <TableRow>
                                             <TableCell align={"center"} variant={"head"}>굵은 골재의 최대치수</TableCell>
-                                            <TableCell align={"center"}>25</TableCell>
+                                            <TableCell align={"center"}>{maxDimension}</TableCell>
                                             <TableCell align={"center"}>mm</TableCell>
                                         </TableRow>
                                         <TableRow>
                                             <TableCell align={"center"} variant={"head"}>호칭강도</TableCell>
-                                            <TableCell align={"center"}>24</TableCell>
+                                            <TableCell align={"center"}>{nominalStrength}</TableCell>
                                             <TableCell align={"center"}>MPa</TableCell>
                                         </TableRow>
                                         <TableRow>
                                             <TableCell align={"center"} variant={"head"}>슬럼프 또는 슬럼프 플로우</TableCell>
-                                            <TableCell align={"center"}>150</TableCell>
+                                            <TableCell align={"center"}>{slump}</TableCell>
                                             <TableCell align={"center"}>mm</TableCell>
                                         </TableRow>
                                     </TableBody>
@@ -176,22 +274,19 @@ export const MixTable = (props) => {
                                         <TableRow>
                                             <TableCell align={"center"} rowSpan={4}>지정사항</TableCell>
                                             <TableCell align={"center"} variant={"head"}>총결합재량</TableCell>
-                                            <TableCell align={"center"}>349</TableCell>
+                                            <TableCell align={"center"}>{totalCombinedAmount}</TableCell>
                                             <TableCell align={"center"}>kg/m3</TableCell>
                                         </TableRow>
-                                        <TableRow>
-                                            <TableCell align={"center"} variant={"head"}>혼화재료 (플라이애시)</TableCell>
-                                            <TableCell align={"center"}>20</TableCell>
-                                            <TableCell align={"center"}>%</TableCell>
-                                        </TableRow>
-                                        <TableRow>
-                                            <TableCell align={"center"} variant={"head"}>혼화재료 (고로슬래그 미분말)</TableCell>
-                                            <TableCell align={"center"}>30</TableCell>
-                                            <TableCell align={"center"}>%</TableCell>
-                                        </TableRow>
+                                        {mixedMaterialArray.map((list, index) => (
+                                            <TableRow key={index}>
+                                                <TableCell align={"center"} variant={"head"} >혼화재료 ({list.name})</TableCell>
+                                                <TableCell align={"center"} >{list.amount}</TableCell>
+                                                <TableCell align={"center"} >{list.unit}</TableCell>
+                                            </TableRow>
+                                        ))}
                                         <TableRow>
                                             <TableCell align={"center"} variant={"head"}>혼합시멘트 (사용비율)</TableCell>
-                                            <TableCell align={"center"}>0</TableCell>
+                                            <TableCell align={"center"}>{mixedCementRatio}</TableCell>
                                             <TableCell align={"center"}>%</TableCell>
                                         </TableRow>
                                     </TableBody>
@@ -202,17 +297,14 @@ export const MixTable = (props) => {
                             <TableContainer>
                                 <Table stickyHeader aria-label={"3tab table"}>
                                     <TableBody>
-                                        <TableRow>
-                                            <TableCell align={"center"} rowSpan={4}>기타</TableCell>
-                                            <TableCell align={"center"} variant={"head"}>염화물량</TableCell>
-                                            <TableCell align={"center"}>0.3</TableCell>
-                                            <TableCell align={"center"}>kg/m3 이하</TableCell>
-                                        </TableRow>
-                                        <TableRow>
-                                            <TableCell align={"center"} variant={"head"}>공기량</TableCell>
-                                            <TableCell align={"center"}>4.5±1.5</TableCell>
-                                            <TableCell align={"center"}>%</TableCell>
-                                        </TableRow>
+                                        {etc.map((list, index) => (
+                                            <TableRow key={index}>
+                                                {index===0 && <TableCell align={"center"} rowSpan={4}>기타</TableCell>}
+                                                <TableCell align={"center"} variant={"head"}>{list.name}</TableCell>
+                                                <TableCell align={"center"}>{list.value}</TableCell>
+                                                <TableCell align={"center"}>{list.unit}</TableCell>
+                                            </TableRow>
+                                        ))}
                                     </TableBody>
                                 </Table>
                             </TableContainer>
@@ -252,7 +344,7 @@ export const MixTable = (props) => {
                                 </TableRow>
                             </TableHead>
                             <TableBody>
-                                <TableRow>
+                                {/* <TableRow>
                                     <TableCell align={"center"}>139</TableCell>
                                     <TableCell align={"center"}>-</TableCell>
                                     <TableCell align={"center"}>-</TableCell>
@@ -267,13 +359,37 @@ export const MixTable = (props) => {
                                     <TableCell align={"center"}>2.79</TableCell>
                                     <TableCell align={"center"}>-</TableCell>
                                     <TableCell align={"center"}>-</TableCell>
-                                </TableRow>
+                                </TableRow> */}
                                 <TableRow>
+                                    <TableCell align={"center"}>{c1}</TableCell>
+                                    <TableCell align={"center"}>{c2}</TableCell>
+                                    <TableCell align={"center"}>{c3}</TableCell>
+                                    <TableCell align={"center"}>{fa}</TableCell>
+                                    <TableCell align={"center"}>{bs}</TableCell>
+                                    <TableCell align={"center"}>{w1}</TableCell>
+                                    <TableCell align={"center"}>{w2}</TableCell>
+                                    <TableCell align={"center"}>{sc}</TableCell>
+                                    <TableCell align={"center"}>{sw}</TableCell>
+                                    <TableCell align={"center"}>{g1}</TableCell>
+                                    <TableCell align={"center"}>{g2}</TableCell>
+                                    <TableCell align={"center"}>{ad1}</TableCell>
+                                    <TableCell align={"center"}>{ad2}</TableCell>
+                                    <TableCell align={"center"}>{ad3}</TableCell>
+                                </TableRow>
+                                {/* <TableRow>
                                     <TableCell align={"center"} colSpan={4} variant={"head"}>물-결합재비(W/B)</TableCell>
                                     <TableCell align={"center"} colSpan={2}>47.5</TableCell>
                                     <TableCell align={"center"}>%</TableCell>
                                     <TableCell align={"center"} colSpan={4} variant={"head"}>잔골재율(S/a)</TableCell>
                                     <TableCell align={"center"} colSpan={2}>47.3</TableCell>
+                                    <TableCell align={"center"}>%</TableCell>
+                                </TableRow> */}
+                                <TableRow>
+                                    <TableCell align={"center"} colSpan={4} variant={"head"}>물-결합재비(W/B)</TableCell>
+                                    <TableCell align={"center"} colSpan={2}>{couplingRatio}</TableCell>
+                                    <TableCell align={"center"}>%</TableCell>
+                                    <TableCell align={"center"} colSpan={4} variant={"head"}>잔골재율(S/a)</TableCell>
+                                    <TableCell align={"center"} colSpan={2}>{fineAggregateRatio}</TableCell>
                                     <TableCell align={"center"}>%</TableCell>
                                 </TableRow>
                             </TableBody>
